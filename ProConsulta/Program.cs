@@ -5,8 +5,10 @@ using MudBlazor.Services;
 using ProConsulta.Components;
 using ProConsulta.Components.Account;
 using ProConsulta.Data;
+using ProConsulta.Repositories.Dockets;
 using ProConsulta.Repositories.Doctors;
 using ProConsulta.Repositories.Patients;
+using ProConsulta.Repositories.Specialities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,8 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuth
 
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+builder.Services.AddScoped<IDocketRepository, DocketRepository>();
+builder.Services.AddScoped<ISpecialityRepository, SpecialityRepository>();
 
 builder.Services.AddAuthentication(options =>
     {
