@@ -1,5 +1,96 @@
-﻿<h3>Create</h3>
+﻿@page "/pacientes/create"
+@using ProConsulta.Models
+@using ProConsulta.Repositories.Patients
+@inject IPatientRepository PatientRepository
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudText Type="Typo.h3">Cadastro de pacientes</MudText>
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmitAsync">
+        <DataAnnotationsValidator/>
+        <ValidationSummary />
+        
+        <MudTextField
+            Label="Nome"
+            HelperText="Campo obrigatório"
+            @bind-Value="InputModel.Name"
+            Variant="Variant.Outlined"/>
+        <ValidationMessage For="@(() => InputModel.Name)" />
+        
+        <MudTextField
+            Label="Documento"
+            HelperText="Campo obrigatório"
+            @bind-Value="InputModel.Document"
+            Mask="@(new PatternMask("000.000.000-00"))"
+            Variant="Variant.Outlined"/>
+        <ValidationMessage For="@(() => InputModel.Document)" />
+        
+        <MudTextField
+            Label="Email"
+            HelperText="Campo obrigatório"
+            @bind-Value="InputModel.Email"
+            Variant="Variant.Outlined"/>
+        <ValidationMessage For="@(() => InputModel.Email)" />
+        
+        <MudTextField
+            Label="Celular"
+            HelperText="Campo obrigatório"
+            @bind-Value="InputModel.Phone"
+            Mask="@(new PatternMask("(00) 0 0000-0000"))"
+            Variant="Variant.Outlined"/>
+        <ValidationMessage For="@(() => InputModel.Phone)" />
+        
+        <MudDatePicker
+            Label="Data de Nascimento"
+            Editable="false"
+            @bind-Date="BirthDate"
+            Variant="Variant.Outlined"
+            Placeholder="Data de Nascimento"/>
+        <ValidationMessage For="@(() => InputModel.BirthDate)" />
+        
+        <MudDivider Class="m-4"/>
+
+        <MudButton
+            Variant="Variant.Filled"
+            StartIcon="@Icons.Material.Filled.Save"
+            Color="Color.Info"
+            Size="Size.Large"
+            ButtonType="ButtonType.Submit">
+            Salvar
+        </MudButton>
+    </EditForm>
+</MudPaper>
 
 @code {
-    
+    public PatientInputModel InputModel { get; set; } = new PatientInputModel();
+
+    public DateTime? BirthDate { get; set; } = DateTime.Today;
+
+    public async Task OnValidSubmitAsync(EditContext editContext)
+    {
+        try
+        {
+            if (editContext.Model is PatientInputModel model)
+            {
+                var patient = new Patient
+                {
+                    Name = model.Name,
+                    Document = model.Document,
+                    PhoneNumber = model.Phone,
+                    Email = model.Email,
+                    BirthDate = model.BirthDate
+                };
+
+                await PatientRepository.AddAsync(patient);
+                Snackbar.Add("Paciente cadastrado com sucesso!", Severity.Success);
+                NavigationManager.NavigateTo("/pacientes");
+            }
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+    }
+
 }

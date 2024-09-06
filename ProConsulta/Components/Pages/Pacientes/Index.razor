@@ -8,8 +8,7 @@
     Color="Color.Info"
     Size="Size.Large"
     Href="/pacientes/create"
-    Class="mt-md-4 mb-4"
->
+    Class="mt-md-4 mb-4">
     Novo Paciente
 </MudButton>
 
@@ -17,13 +16,12 @@
     Items="@Patients"
     Filterable="false"
     SortMode="@SortMode.Single"
-    Groupable="false"
->
+    Groupable="false">
     <Columns>
-        <PropertyColumn Property="patient => patient.Name" />
-        <PropertyColumn Property="patient => patient.Document" />
-        <PropertyColumn Property="patient => patient.Email" />
-        <PropertyColumn Property="patient => patient.PhoneNumber" />
+        <PropertyColumn Property="patient => patient.Name"/>
+        <PropertyColumn Property="patient => patient.Document"/>
+        <PropertyColumn Property="patient => patient.Email"/>
+        <PropertyColumn Property="patient => patient.PhoneNumber"/>
         <PropertyColumn Property="patient => patient.BirthDate" Format="dd/MM/yyyy"/>
 
         <TemplateColumn>
@@ -34,13 +32,12 @@
                         Label="Editar"
                         onclick="@(() => GoToUpdate(context.Item.Id))"
                         StartIcon="@Icons.Material.Filled.Edit"
-                        Color="Color.Success"
-                    />
+                        Color="Color.Success"/>
                     <MudFab Size="Size.Small"
-                        Label="Excluir"
-                        onclick="@(() => DeletePatient(context.Item))"
-                        StartIcon="@Icons.Material.Filled.Remove"
-                        Color="Color.Error" />
+                            Label="Excluir"
+                            onclick="@(() => DeletePatient(context.Item))"
+                            StartIcon="@Icons.Material.Filled.Remove"
+                            Color="Color.Error"/>
                 </MudStack>
             </CellTemplate>
         </TemplateColumn>

@@ -1,9 +1,8 @@
 ﻿using ProConsulta.Models;
 
-namespace ProConsulta.Repositories.Specialities
+namespace ProConsulta.Repositories.Specialities;
+
+public interface ISpecialityRepository
 {
-    public interface ISpecialityRepository
-    {
-        Task<List<Speciality>> GetAllAsync();
-    }
+    Task<List<Speciality>> GetAllAsync();
 }

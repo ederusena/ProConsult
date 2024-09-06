@@ -1,13 +1,12 @@
 ﻿using ProConsulta.Models;
 
-namespace ProConsulta.Repositories.Patients
+namespace ProConsulta.Repositories.Patients;
+
+public interface IPatientRepository
 {
-    public interface IPatientRepository
-    {
-        Task AddAsync(Patient patient);
-        Task UpdateAsync(Patient patient);
-        Task<List<Patient>> GetAllAsync();
-        Task DeleteByIdAsync(int id);
-        Task<Patient?> GetByIdAsync(int id);
-    }
+    Task AddAsync(Patient patient);
+    Task UpdateAsync(Patient patient);
+    Task<List<Patient>> GetAllAsync();
+    Task DeleteByIdAsync(int id);
+    Task<Patient?> GetByIdAsync(int id);
 }
