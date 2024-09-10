@@ -13,6 +13,8 @@ using ProConsulta.Repositories.Specialities;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add MudBlazor services
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 
 // Add services to the container.

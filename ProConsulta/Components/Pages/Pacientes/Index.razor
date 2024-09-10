@@ -26,16 +26,16 @@
 
         <TemplateColumn>
             <CellTemplate>
-                <MudStack row>
+                <MudStack Row="true">
                     <MudFab
                         Size="Size.Small"
                         Label="Editar"
-                        onclick="@(() => GoToUpdate(context.Item.Id))"
+                        OnClick="@(() => GoToUpdate(context.Item.Id))"
                         StartIcon="@Icons.Material.Filled.Edit"
                         Color="Color.Success"/>
                     <MudFab Size="Size.Small"
                             Label="Excluir"
-                            onclick="@(() => DeletePatient(context.Item))"
+                            OnClick="@(() => DeletePatient(context.Item))"
                             StartIcon="@Icons.Material.Filled.Remove"
                             Color="Color.Error"/>
                 </MudStack>

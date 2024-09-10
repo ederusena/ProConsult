@@ -22,5 +22,5 @@ public class PatientInputModel
     public string Phone { get; set; }
     
     [Required(ErrorMessage = "Data de nascimento deve ser fornecido")]
-    public DateTime BirthDate { get; set; } = DateTime.Today;
+    public DateTime BirthDate { get; set; }
 }

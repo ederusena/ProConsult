@@ -1,6 +1,113 @@
-﻿@page "/Update"
-<h3>Update</h3>
+﻿@page "/pacientes/update/{PatientId:int}"
+@using ProConsulta.Extensions
+@using ProConsulta.Repositories.Patients;
+@using ProConsulta.Models;
+@inject IPatientRepository PatientRepository
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudText Type="Typo.h3">Atualização de paciente</MudText>
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmitAsync">
+        <DataAnnotationsValidator/>
+        <MudTextField
+            Label="Nome"
+            HelperText="Campo obrigatório"
+            @bind-Value="InputModel.Name"
+            For="@(() => InputModel.Name)"
+            Variant="Variant.Outlined"/>
+
+        <MudTextField
+            Label="Documento"
+            @bind-Value="InputModel.Document"
+            Disabled="true"
+            Mask="@(new PatternMask("000.000.000-00"))"
+            Variant="Variant.Outlined"/>
+
+        <MudTextField
+            Label="Email"
+            HelperText="Campo obrigatório"
+            @bind-Value="InputModel.Email"
+            For="@(() => InputModel.Email)"
+            Variant="Variant.Outlined"/>
+
+        <MudTextField
+            Label="Celular"
+            HelperText="Campo obrigatório"
+            @bind-Value="InputModel.Phone"
+            For="@(() => InputModel.Phone)"
+            Mask="@(new PatternMask("(00) 0 0000-0000"))"
+            Variant="Variant.Outlined"/>
+
+        <MudDatePicker
+            Label="Data de Nascimento"
+            Editable="false"
+            @bind-Date="BirthDate"
+            Orientation="Orientation.Landscape"
+            Variant="Variant.Outlined"
+            MaxDate="@MaxDate"
+            Placeholder="Data de Nascimento"/>
+
+        <MudDivider Class="m-4"/>
+
+        <MudButton
+            Variant="Variant.Filled"
+            StartIcon="@Icons.Material.Filled.Save"
+            Color="Color.Info"
+            Size="Size.Large"
+            ButtonType="ButtonType.Submit">
+            Salvar
+        </MudButton>
+    </EditForm>
+</MudPaper>
 
 @code {
-    
+    [Parameter] public int PatientId { get; set; }
+    public PatientInputModel InputModel { get; set; } = new PatientInputModel();
+    private Patient? CurrentPatient { get; set; }
+    public DateTime? BirthDate { get; set; } = DateTime.Today;
+    public DateTime? MaxDate { get; set; } = DateTime.Today;
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentPatient = await PatientRepository.GetByIdAsync(PatientId);
+
+        if (CurrentPatient is null)
+        {
+            return;
+        }
+
+        InputModel = new PatientInputModel()
+        {
+            Id = CurrentPatient.Id,
+            Name = CurrentPatient.Name,
+            Phone = CurrentPatient.PhoneNumber,
+            Document = CurrentPatient.Document,
+            BirthDate = CurrentPatient.BirthDate,
+            Email = CurrentPatient.Email
+        };
+    }
+
+    public async Task OnValidSubmitAsync(EditContext editContext)
+    {
+        try
+        {
+            if (editContext.Model is PatientInputModel model)
+            {
+                CurrentPatient.Name = model.Name;
+                CurrentPatient.Document = model.Document.SomenteCaracteres();
+                CurrentPatient.PhoneNumber = model.Phone.SomenteCaracteres();
+                CurrentPatient.Email = model.Email;
+                CurrentPatient.BirthDate = model.BirthDate;
+
+                await PatientRepository.UpdateAsync(CurrentPatient);
+                Snackbar.Add("Paciente atualizado com sucesso!", Severity.Success);
+                NavigationManager.NavigateTo("/pacientes");
+            }
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+    }
+
 }
