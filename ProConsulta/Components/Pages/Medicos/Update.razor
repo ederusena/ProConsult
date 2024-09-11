@@ -1,0 +1,132 @@
+﻿@page "/medicos/update/{DoctorId:int}"
+@using ProConsulta.Extensions
+@using ProConsulta.Models
+@using ProConsulta.Repositories.Doctors
+@using ProConsulta.Repositories.Specialities
+@inject IDoctorRepository DoctorRepository
+@inject ISpecialityRepository SpecialityRepository
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Médico atualizar</PageTitle>
+
+<PageTitle>Médicos</PageTitle>
+<MudText Type="Typo.h3">Cadastro de Médico</MudText>
+<MudPaper Class="pa-8 mt-4">
+    <EditForm Model="@InputModel" OnValidSubmit="OnValidSubmitAsync">
+        <DataAnnotationsValidator/>
+        <MudTextField
+            Label="Nome"
+            HelperText="*Campo obrigatório"
+            @bind-Value="InputModel.Name"
+            For="@(() => InputModel.Name)"
+            Variant="Variant.Outlined"/>
+
+        <MudTextField
+            Label="Documento"
+            HelperText="*Campo obrigatório"
+            @bind-Value="InputModel.Document"
+            Disabled="true"
+            For="@(() => InputModel.Document)"
+            Mask="@(new PatternMask("000.000.000-00"))"
+            Variant="Variant.Outlined"/>
+
+        <MudTextField
+            Label="CRM"
+            HelperText="*Campo obrigatório"
+            @bind-Value="InputModel.CRM"
+            Disabled="true"
+            For="@(() => InputModel.CRM)"
+            Mask="@(new PatternMask("aa-000000"))"
+            Variant="Variant.Outlined"/>
+
+        <MudTextField
+            Label="Celular"
+            HelperText="*Campo obrigatório"
+            @bind-Value="InputModel.PhoneNumber"
+            For="@(() => InputModel.PhoneNumber)"
+            Mask="@(new PatternMask("(00) 0 0000-0000"))"
+            Variant="Variant.Outlined"/>
+
+        <MudStack>
+            <MudSelect
+                @bind-Value="InputModel.SpecialityId"
+                Label="Especialidade"
+                AnchorOrigin="Origin.BottomCenter"
+                Variant="Variant.Outlined"
+                Placeholder="Selecione a Especialidade"
+                Text=""
+                For="@(() => InputModel.SpecialityId )"
+                HelperText="*Campo Obrigatório">
+                @foreach (var speciality in Specialities)
+                {
+                <MudSelectItem Value="@speciality.Id">@speciality.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+        <MudDivider Class="m-4"/>
+
+        <MudButton
+            Variant="Variant.Filled"
+            StartIcon="@Icons.Material.Filled.Save"
+            Color="Color.Info"
+            Size="Size.Large"
+            ButtonType="ButtonType.Submit">
+            Salvar
+        </MudButton>
+    </EditForm>
+</MudPaper>
+
+
+@code {
+    [Parameter] private int DoctorId { get; set; }
+    private DoctorInputModel InputModel { get; set; } = new DoctorInputModel();
+    public List<Speciality> Specialities { get; set; } = new List<Speciality>();
+    private Doctor? CurrentDoctor { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        CurrentDoctor = await DoctorRepository.GetByIdAsync(DoctorId);
+        Specialities = await SpecialityRepository.GetAllAsync();
+        
+        if (CurrentDoctor is null)
+        {
+            return;
+        }
+
+        InputModel = new DoctorInputModel()
+        {
+            Id = CurrentDoctor.Id,
+            Name = CurrentDoctor.Name,
+            PhoneNumber = CurrentDoctor.PhoneNumber,
+            Document = CurrentDoctor.Document,
+            CRM = CurrentDoctor.CRM,
+            SpecialityId = CurrentDoctor.SpecialityId
+        };
+    }
+    public async Task OnValidSubmitAsync(EditContext editContext)
+    {
+        try
+        {
+            if (CurrentDoctor is null) return;
+            
+            if (editContext.Model is DoctorInputModel model)
+            {
+                CurrentDoctor.Id = DoctorId;
+                CurrentDoctor.Name = model.Name;
+                CurrentDoctor.Document = model.Document.SomenteCaracteres();
+                CurrentDoctor.PhoneNumber = model.PhoneNumber.SomenteCaracteres();
+                CurrentDoctor.CRM = model.CRM.SomenteCaracteres();
+                CurrentDoctor.SpecialityId = model.SpecialityId;
+                
+                await DoctorRepository.UpdateAsync(CurrentDoctor);
+                Snackbar.Add("Médico atualizado com sucesso!", Severity.Success);
+                NavigationManager.NavigateTo("/medicos");
+            }
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+    }
+}
