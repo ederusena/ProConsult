@@ -1,1 +1,91 @@
-﻿
+﻿@page "/medicos"
+@using ProConsulta.Models
+@using ProConsulta.Repositories.Doctors
+@using ProConsulta.Repositories.Specialities
+@inject IDoctorRepository DoctorRepository
+@inject ISpecialityRepository SpecialityRepository
+@inject NavigationManager NavigationManager
+@inject IDialogService Dialog
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h3">Médicos</MudText>
+<MudButton
+    Variant="Variant.Filled"
+    StartIcon="@Icons.Material.Filled.Add"
+    Color="Color.Info"
+    Size="Size.Large"
+    Href="/medicos/create"
+    Class="mt-md-4 mb-4">
+    Novo Médico
+</MudButton>
+
+<MudDataGrid
+    Items="@Doctors"
+    Filterable="false"
+    SortMode="@SortMode.Single"
+    Groupable="false">
+    <Columns>
+        <PropertyColumn Property="patient => patient.Name"/>
+        <PropertyColumn Property="patient => patient.Document"/>
+        <PropertyColumn Property="patient => patient.Speciality.Name" Title="Especialidade"/>
+        <PropertyColumn Property="patient => patient.CRM" Title="CRM"/>
+        <PropertyColumn Property="patient => patient.PhoneNumber" />
+
+        <TemplateColumn CellClass="d-flex justify-center">
+            <CellTemplate>
+                <MudStack Row="true">
+                    <MudFab
+                        Size="Size.Small"
+                        Label="Editar"
+                        OnClick="@(() => GoToUpdate(context.Item.Id))"
+                        StartIcon="@Icons.Material.Filled.Edit"
+                        Color="Color.Success"/>
+                    <MudFab Size="Size.Small"
+                            Label="Excluir"
+                            OnClick="@(() => DeleteDoctor(context.Item))"
+                            StartIcon="@Icons.Material.Filled.Remove"
+                            Color="Color.Error"/>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    private List<Doctor> Doctors { get; set; } = new List<Doctor>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        Doctors = await DoctorRepository.GetAllAsync();
+    }
+
+    private async Task DeleteDoctor(Doctor doctor)
+    {
+        try
+        {
+            var result = await Dialog.ShowMessageBox(
+                "Atenção",
+                $"Deseja apagar o médico {doctor.Name}?",
+                "SIM",
+                cancelText: "Cancel"
+            );
+
+            if (result is true)
+            {
+                await DoctorRepository.DeleteByIdAsync(doctor.Id);
+                Snackbar.Add($"Médico {doctor.Name}, excluído com sucesso!", Severity.Success);
+            }
+            await OnInitializedAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+    
+    protected void GoToUpdate(int id)
+    {
+        NavigationManager.NavigateTo($"/medicos/update/{id}");
+    }
+    
+}

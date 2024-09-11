@@ -15,8 +15,16 @@ public class DoctorRepository : IDoctorRepository
 
     public async Task AddAsync(Doctor doctor)
     {
-        _context.Doctors.Add(doctor);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Doctors.Add(doctor);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            _context.ChangeTracker.Clear();
+            throw;
+        }
     }
 
     public async Task DeleteByIdAsync(int id)
@@ -47,7 +55,15 @@ public class DoctorRepository : IDoctorRepository
 
     public async Task UpdateAsync(Doctor doctor)
     {
-        _context.Doctors.Update(doctor);
-        await _context.SaveChangesAsync();
+        try
+        {
+            _context.Doctors.Update(doctor);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            _context.ChangeTracker.Clear();
+            throw;
+        }
     }
 }
